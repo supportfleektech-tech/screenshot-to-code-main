@@ -106,7 +106,10 @@ OpenRouter, NVIDIA NIM, Kilo, and OpenCode Zen all expose an OpenAI-compatible
 client it already uses — there is no per-provider SDK, only a base URL, a key,
 and a model id. The table of what each one is wired up for lives in
 `backend/llm_gateways.py`; add a model or a whole gateway there and it shows up
-in variant selection, the run logs, and the Settings dialog.
+in variant selection, the run logs, and the Settings dialog. Slugs churn on the
+free tiers, so check a model still exists before adding one - these three
+catalogs are readable without a key: `https://openrouter.ai/api/v1/models`,
+`https://opencode.ai/zen/v1/models`, and `https://zenmux.ai/api/v1/models`.
 
 | Gateway | Base URL | Key |
 | ------- | -------- | --- |
@@ -118,7 +121,8 @@ in variant selection, the run logs, and the Settings dialog.
 
 "Zen" is two different routers depending on who you ask, so both are wired:
 `zen` is OpenCode Zen (free models, rotating catalog) and `zenmux` is ZenMux
-(pay-per-use routing to GPT/Gemini/Claude).
+(pay-per-use routing to GPT/Gemini/Claude, plus a few `-free` slugs of its own
+that it badges as **Free** in this app).
 
 - Add the key in the Settings dialog or `backend/.env`; a `.env` change needs a
   backend restart.
@@ -135,6 +139,14 @@ in variant selection, the run logs, and the Settings dialog.
   models that cannot see are skipped for screenshot runs.
 - Models marked `supports_tools: false` (e.g. the hosted Llama Vision builds)
   are not offered agent tools; they write the HTML directly in one answer.
+- **Free endpoints often log prompts.** OpenRouter shows a banner on the free
+  variants of several models (Nemotron, Inkling and friends): the prompt and
+  the output are kept and used to train the model. If the screenshot you are
+  uploading is confidential, use a paid key.
+- Kilo answers `:free` model requests **without a key** at all - anonymous
+  calls are rate-limited by IP (about 200/hour). Point `KILO_BASE_URL` at
+  `https://api.kilo.ai/api/gateway` and set any placeholder value for
+  `KILO_API_KEY` to try that path without signing up.
 - Running behind a proxy or a self-hosted endpoint? Set `OPENROUTER_BASE_URL`,
   `NVIDIA_BASE_URL`, `KILO_BASE_URL`, `ZEN_BASE_URL`, or `ZENMUX_BASE_URL`, or
   use the matching field in the Settings dialog. Like `OPENAI_BASE_URL`, these
@@ -159,7 +171,7 @@ The app will be up and running at http://localhost:5173. Note that you can't dev
 
 - **I'm running into an error when setting up the backend. How can I fix it?** [Try this](https://github.com/abi/screenshot-to-code/issues/3#issuecomment-1814777959). If that still doesn't work, open an issue.
 - **How do I get an OpenAI API key?** See https://github.com/abi/screenshot-to-code/blob/main/Troubleshooting.md
-- **Can I use a free provider instead of OpenAI/Anthropic/Gemini?** Yes — see [Free and low-cost providers](#-free-and-low-cost-providers). Put an `OPENROUTER_API_KEY`, `NVIDIA_API_KEY`, `KILO_API_KEY`, or `ZEN_API_KEY` in `backend/.env` or the Settings dialog, and the app will generate with that gateway's models when no first-party key is set.
+- **Can I use a free provider instead of OpenAI/Anthropic/Gemini?** Yes — see [Free and low-cost providers](#-free-and-low-cost-providers). Put an `OPENROUTER_API_KEY`, `NVIDIA_API_KEY`, `KILO_API_KEY`, `ZEN_API_KEY`, or `ZENMUX_API_KEY` in `backend/.env` or the Settings dialog, and the app will generate with that gateway's models when no first-party key is set.
 - **How can I configure an OpenAI proxy?** If you're not able to access the OpenAI API directly, for example because of country restrictions, you can try a VPN or configure the OpenAI base URL to use a proxy. Set `OPENAI_BASE_URL` in `backend/.env` or directly in the UI in the settings dialog. Make sure the URL has `v1` in the path, for example: `https://xxx.xxxxx.xxx/v1`.
 - **How can I update the backend host that my frontend connects to?** Configure `VITE_HTTP_BACKEND_URL` and `VITE_WS_BACKEND_URL` in `frontend/.env.local`. For example, set `VITE_HTTP_BACKEND_URL=http://124.10.20.1:7001`.
 - **Seeing UTF-8 errors when running the backend?** On Windows, open the `.env` file with Notepad++, then go to Encoding and select UTF-8.

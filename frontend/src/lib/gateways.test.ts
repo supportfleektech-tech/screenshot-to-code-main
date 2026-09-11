@@ -52,6 +52,21 @@ describe("gateway registry", () => {
     ).toBe("https://api.kilo.ai/api/gateway");
   });
 
+  test("a free-slug model is badged, so it cannot be mistaken for a frontier one", () => {
+    // Gateways mark free tiers in the model id; the badge map is keyed by hand,
+    // so a newly curated `:free` slug can silently ship without a Free badge.
+    for (const gateway of GATEWAY_OPTIONS) {
+      for (const option of gateway.models) {
+        const slug = option.model.slice(gateway.id.length + 1);
+        if (!/(?::free|-free|\/free)$/.test(slug)) continue;
+        expect(getVariantLabel(option.model, CREATE)).toEqual({
+          text: "Free",
+          tone: "free",
+        });
+      }
+    }
+  });
+
   test("free-tier variants are badged so they read differently from frontier ones", () => {
     const label = getVariantLabel(
       CodeGenerationModel.OPENROUTER_GEMMA_4_31B_FREE,

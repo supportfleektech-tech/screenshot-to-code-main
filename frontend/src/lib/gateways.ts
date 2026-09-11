@@ -48,7 +48,7 @@ export const GATEWAY_OPTIONS: GatewayOption[] = [
     defaultBaseUrl: "https://openrouter.ai/api/v1",
     signupUrl: "https://openrouter.ai/keys",
     blurb:
-      "One key for many models, including a rotating set of :free ones. Free models are rate-limited and markedly weaker at screenshot-to-code than GPT, Claude, or Gemini.",
+      "One key for many models, including a rotating set of :free ones. Free models are rate-limited, may log your prompts, and are markedly weaker at screenshot-to-code than GPT, Claude, or Gemini.",
     models: [
       {
         model: CodeGenerationModel.OPENROUTER_GEMMA_4_31B_FREE,
@@ -63,6 +63,14 @@ export const GATEWAY_OPTIONS: GatewayOption[] = [
         supportsVision: true,
       },
       { model: CodeGenerationModel.OPENROUTER_AUTO_FREE, supportsVision: true },
+      {
+        model: CodeGenerationModel.OPENROUTER_GEMMA_4_26B_A4B_FREE,
+        supportsVision: true,
+      },
+      {
+        model: CodeGenerationModel.OPENROUTER_LING_3_0_FLASH_VL_FREE,
+        supportsVision: true,
+      },
     ],
   },
   {
@@ -94,6 +102,10 @@ export const GATEWAY_OPTIONS: GatewayOption[] = [
     models: [
       { model: CodeGenerationModel.KILO_NEMOTRON_OMNI_30B_FREE, supportsVision: true },
       { model: CodeGenerationModel.KILO_AUTO, supportsVision: true },
+      {
+        model: CodeGenerationModel.KILO_LING_3_0_FLASH_VL_FREE,
+        supportsVision: true,
+      },
       { model: CodeGenerationModel.KILO_MINIMAX_M2_5_FREE, supportsVision: false },
     ],
   },
@@ -121,10 +133,11 @@ export const GATEWAY_OPTIONS: GatewayOption[] = [
     defaultBaseUrl: "https://zenmux.ai/api/v1",
     signupUrl: "https://zenmux.ai",
     blurb:
-      "A different router than OpenCode Zen — wired as its own provider because \"Zen\" means either depending on where you read about it. Pay-per-use, no free slugs.",
+      "A different router than OpenCode Zen — wired as its own provider because \"Zen\" means either depending on where you read about it. Mostly pay-per-use routing to GPT, Gemini, and Claude, with a small rotating set of -free slugs.",
     models: [
       { model: CodeGenerationModel.ZENMUX_GPT_5, supportsVision: true },
       { model: CodeGenerationModel.ZENMUX_GEMINI_2_5_PRO, supportsVision: true },
+      { model: CodeGenerationModel.ZENMUX_GLM_4_6V_FLASH_FREE, supportsVision: true },
     ],
   },
 ];

@@ -242,12 +242,15 @@ class TestModelSelectionGatewayOnly:
             gateway_api_keys={"openrouter": "sk-or-test"},
         )
 
-        # Tool-capable models lead; the tool-less VL model lands last.
+        # Tool-capable models lead, in registry order. The tool-less VL model and
+        # the newest free slug are held in reserve: curating more models than
+        # there are variants is what lets a saturated or retired endpoint be
+        # swapped in `llm_gateways.py` without touching this selection logic.
         assert models == [
             Llm.OPENROUTER_GEMMA_4_31B_FREE,
             Llm.OPENROUTER_NEMOTRON_OMNI_30B_FREE,
             Llm.OPENROUTER_AUTO_FREE,
-            Llm.OPENROUTER_NEMOTRON_NANO_12B_VL_FREE,
+            Llm.OPENROUTER_GEMMA_4_26B_A4B_FREE,
         ]
 
     @pytest.mark.asyncio
@@ -294,12 +297,32 @@ class TestModelSelectionGatewayOnly:
 
         assert Llm.KILO_MINIMAX_M2_5_FREE not in models
         assert Llm.ZEN_BIG_PICKLE not in models
-        # Three usable models across two gateways, cycled to four variants.
+        # Four usable models across the two gateways, one per variant.
         assert models == [
             Llm.KILO_NEMOTRON_OMNI_30B_FREE,
             Llm.KILO_AUTO,
+            Llm.KILO_LING_3_0_FLASH_VL_FREE,
             Llm.ZEN_GPT_5_NANO,
-            Llm.KILO_NEMOTRON_OMNI_30B_FREE,
+        ]
+
+    @pytest.mark.asyncio
+    async def test_fewer_models_than_variants_are_repeated(self):
+        """NVIDIA NIM curates two vision models and neither can call tools, so a
+        four-variant run repeats them rather than inventing a variant."""
+        models = await self.model_selector.select_models(
+            generation_type="create",
+            input_mode="image",
+            openai_api_key=None,
+            anthropic_api_key=None,
+            gemini_api_key=None,
+            gateway_api_keys={"nvidia": "nvapi-test"},
+        )
+
+        assert models == [
+            Llm.NVIDIA_LLAMA_3_2_90B_VISION,
+            Llm.NVIDIA_LLAMA_3_2_11B_VISION,
+            Llm.NVIDIA_LLAMA_3_2_90B_VISION,
+            Llm.NVIDIA_LLAMA_3_2_11B_VISION,
         ]
 
     @pytest.mark.asyncio

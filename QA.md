@@ -18,7 +18,7 @@
   (they arrive as a follow-up user turn, since `tool` messages are text-only)
 - Variant labels (Fast / Max / Free) show correctly
 
-## OpenAI-compatible gateways (OpenRouter, NVIDIA NIM, Kilo, OpenCode Zen)
+## OpenAI-compatible gateways (OpenRouter, NVIDIA NIM, Kilo, OpenCode Zen, ZenMux)
 - With *only* a gateway key set, a generation runs and streams; the Settings
   dialog fields and `backend/.env` both work, and the dialog value wins
 - With a first-party key also set, gateway models are not used at all
@@ -30,6 +30,12 @@
   one retry instead of failing the variant — check the backend log for
   "gateway rejected"
 - OpenRouter and Kilo requests carry `HTTP-Referer` / `X-Title`
+- The curated slugs still resolve: `https://openrouter.ai/api/v1/models`,
+  `https://opencode.ai/zen/v1/models` and `https://zenmux.ai/api/v1/models` are
+  public, so diff `backend/llm_gateways.py` against them. A retired slug surfaces
+  as a variant error naming the gateway, not as a silent fallback
+- Free gateways may log prompts for training (OpenRouter states this per model);
+  say so in the Settings blurb of any free provider added later
 - Run logs label the provider as the gateway id, and prompt reports are written
   under `prompt_report_*_openrouter_*.json`
 

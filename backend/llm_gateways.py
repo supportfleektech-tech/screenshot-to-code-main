@@ -140,6 +140,21 @@ _OPENROUTER = Gateway(
             supports_vision=True,
             supports_tools=True,
         ),
+        # Same family as the 31B, but a 25B MoE with 3.8B active parameters:
+        # near-identical quality at higher throughput, so it is worth trying
+        # when the dense free endpoint is saturated.
+        GatewayModel(
+            api_name="google/gemma-4-26b-a4b-it:free",
+            supports_vision=True,
+            supports_tools=True,
+        ),
+        # Newest free vision+tool-calling slug (Sep 2026). Fresh slugs are the
+        # best odds of not being rate-limited, and the worst odds of surviving.
+        GatewayModel(
+            api_name="inclusionai/ling-3.0-flash-vl:free",
+            supports_vision=True,
+            supports_tools=True,
+        ),
     ),
 )
 
@@ -189,6 +204,13 @@ _KILO = Gateway(
         # Kilo's own router (advertises image input + tool calling); costs a
         # little but keeps working when a `:free` slug is retired.
         GatewayModel(api_name="kilo/auto", supports_vision=True, supports_tools=True),
+        # Kilo mirrors OpenRouter's id space, so a `:free` slug that is
+        # saturated on one is usually reachable through the other.
+        GatewayModel(
+            api_name="inclusionai/ling-3.0-flash-vl:free",
+            supports_vision=True,
+            supports_tools=True,
+        ),
         GatewayModel(
             api_name="minimax/minimax-m2.5:free",
             # Text-only: fine for text -> code, blind to screenshots.
@@ -232,9 +254,9 @@ _ZENMUX = Gateway(
     settings_key="zenmuxApiKey",
     settings_base_url_key="zenmuxBaseUrl",
     docs_url="https://zenmux.ai",
-    # ZenMux routes frontier models rather than hosting free slugs, so these
-    # are the pay-per-use ids its own docs use. Listed for the case where
-    # "the Zen gateway" meant this one rather than OpenCode Zen.
+    # ZenMux is a pay-per-use router for frontier models, so the useful ids are
+    # the plain ones below. Its free tier uses a `-free` suffix rather than
+    # OpenRouter's `:free`, and it rotates.
     models=(
         GatewayModel(
             api_name="openai/gpt-5", supports_vision=True, supports_tools=True
@@ -242,6 +264,13 @@ _ZENMUX = Gateway(
         GatewayModel(
             api_name="google/gemini-2.5-pro",
             supports_vision=True,
+            supports_tools=True,
+        ),
+        GatewayModel(
+            api_name="z-ai/glm-4.6v-flash-free",
+            supports_vision=True,
+            # GLM-4.6V was the first vision model to ship function calling
+            # natively in Z.ai's line, so the agent loop works here.
             supports_tools=True,
         ),
     ),

@@ -67,6 +67,8 @@ class Llm(Enum):
         "openrouter/nvidia/nemotron-nano-12b-v2-vl:free"
     )
     OPENROUTER_AUTO_FREE = "openrouter/openrouter/free"
+    OPENROUTER_GEMMA_4_26B_A4B_FREE = "openrouter/google/gemma-4-26b-a4b-it:free"
+    OPENROUTER_LING_3_0_FLASH_VL_FREE = "openrouter/inclusionai/ling-3.0-flash-vl:free"
     NVIDIA_LLAMA_3_2_90B_VISION = "nvidia/meta/llama-3.2-90b-vision-instruct"
     NVIDIA_LLAMA_3_2_11B_VISION = "nvidia/meta/llama-3.2-11b-vision-instruct"
     KILO_NEMOTRON_OMNI_30B_FREE = (
@@ -74,12 +76,14 @@ class Llm(Enum):
     )
     KILO_AUTO = "kilo/kilo/auto"
     KILO_MINIMAX_M2_5_FREE = "kilo/minimax/minimax-m2.5:free"
+    KILO_LING_3_0_FLASH_VL_FREE = "kilo/inclusionai/ling-3.0-flash-vl:free"
     ZEN_GPT_5_NANO = "zen/gpt-5-nano"
     ZEN_BIG_PICKLE = "zen/big-pickle"
     # ZenMux is a different router than OpenCode Zen; both are wired because
     # "Zen" means either depending on where you read about it.
     ZENMUX_GPT_5 = "zenmux/openai/gpt-5"
     ZENMUX_GEMINI_2_5_PRO = "zenmux/google/gemini-2.5-pro"
+    ZENMUX_GLM_4_6V_FLASH_FREE = "zenmux/z-ai/glm-4.6v-flash-free"
 
 
 class Completion(TypedDict):
@@ -147,15 +151,19 @@ MODEL_PROVIDER: dict[Llm, str] = {
     Llm.OPENROUTER_NEMOTRON_OMNI_30B_FREE: "openrouter",
     Llm.OPENROUTER_NEMOTRON_NANO_12B_VL_FREE: "openrouter",
     Llm.OPENROUTER_AUTO_FREE: "openrouter",
+    Llm.OPENROUTER_GEMMA_4_26B_A4B_FREE: "openrouter",
+    Llm.OPENROUTER_LING_3_0_FLASH_VL_FREE: "openrouter",
     Llm.NVIDIA_LLAMA_3_2_90B_VISION: "nvidia",
     Llm.NVIDIA_LLAMA_3_2_11B_VISION: "nvidia",
     Llm.KILO_NEMOTRON_OMNI_30B_FREE: "kilo",
     Llm.KILO_AUTO: "kilo",
     Llm.KILO_MINIMAX_M2_5_FREE: "kilo",
+    Llm.KILO_LING_3_0_FLASH_VL_FREE: "kilo",
     Llm.ZEN_GPT_5_NANO: "zen",
     Llm.ZEN_BIG_PICKLE: "zen",
     Llm.ZENMUX_GPT_5: "zenmux",
     Llm.ZENMUX_GEMINI_2_5_PRO: "zenmux",
+    Llm.ZENMUX_GLM_4_6V_FLASH_FREE: "zenmux",
 }
 
 # Convenience sets for membership checks

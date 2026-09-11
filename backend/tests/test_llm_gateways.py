@@ -138,11 +138,11 @@ def test_tool_capable_models_lead_models_that_need_plain_output() -> None:
     assert all(not supports_tools(model) for model in models)
 
     models = select_gateway_models(
-        [GATEWAYS["openrouter"]], vision_required=True, limit=4
+        [GATEWAYS["openrouter"]], vision_required=True, limit=99
     )
     assert models[0] == Llm.OPENROUTER_GEMMA_4_31B_FREE
     # The 12B VL model is the only non-tool-caller in the OpenRouter set, so it
-    # is last.
+    # is last - and it is the entry a 4-variant run leaves out.
     assert models[-1] == Llm.OPENROUTER_NEMOTRON_NANO_12B_VL_FREE
 
 
@@ -151,6 +151,21 @@ def test_selection_respects_the_variant_limit() -> None:
         [GATEWAYS["openrouter"], GATEWAYS["kilo"]], vision_required=True, limit=2
     )
     assert len(models) == 2
+
+
+def test_the_first_curated_model_leads_that_gateway_s_selection() -> None:
+    """Registry order is preference order.
+
+    A single-variant update run gets one model per configured gateway, and
+    `select_gateway_models` keeps registry order inside a capability class, so
+    the first entry of a gateway is what that run uses. Keep it the
+    best-understood model rather than the newest slug someone added in a hurry.
+    """
+    for gateway in GATEWAYS.values():
+        first = gateway.models[0]
+        assert first.supports_vision, gateway.id
+        selected = select_gateway_models([gateway], vision_required=True, limit=1)
+        assert gateway_api_name(selected[0]) == first.api_name
 
 
 def test_gateway_api_name_rejects_first_party_models() -> None:

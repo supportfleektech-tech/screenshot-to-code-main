@@ -46,15 +46,19 @@ export enum CodeGenerationModel {
   OPENROUTER_NEMOTRON_OMNI_30B_FREE = "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
   OPENROUTER_NEMOTRON_NANO_12B_VL_FREE = "openrouter/nvidia/nemotron-nano-12b-v2-vl:free",
   OPENROUTER_AUTO_FREE = "openrouter/openrouter/free",
+  OPENROUTER_GEMMA_4_26B_A4B_FREE = "openrouter/google/gemma-4-26b-a4b-it:free",
+  OPENROUTER_LING_3_0_FLASH_VL_FREE = "openrouter/inclusionai/ling-3.0-flash-vl:free",
   NVIDIA_LLAMA_3_2_90B_VISION = "nvidia/meta/llama-3.2-90b-vision-instruct",
   NVIDIA_LLAMA_3_2_11B_VISION = "nvidia/meta/llama-3.2-11b-vision-instruct",
   KILO_NEMOTRON_OMNI_30B_FREE = "kilo/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
   KILO_AUTO = "kilo/kilo/auto",
   KILO_MINIMAX_M2_5_FREE = "kilo/minimax/minimax-m2.5:free",
+  KILO_LING_3_0_FLASH_VL_FREE = "kilo/inclusionai/ling-3.0-flash-vl:free",
   ZEN_GPT_5_NANO = "zen/gpt-5-nano",
   ZEN_BIG_PICKLE = "zen/big-pickle",
   ZENMUX_GPT_5 = "zenmux/openai/gpt-5",
   ZENMUX_GEMINI_2_5_PRO = "zenmux/google/gemini-2.5-pro",
+  ZENMUX_GLM_4_6V_FLASH_FREE = "zenmux/z-ai/glm-4.6v-flash-free",
 }
 
 export type VariantLabelTone = "fast" | "max" | "free";
@@ -87,6 +91,22 @@ const VARIANT_LABELS: Partial<Record<CodeGenerationModel, VariantLabel>> = {
     tone: "free",
   },
   [CodeGenerationModel.OPENROUTER_AUTO_FREE]: { text: "Free", tone: "free" },
+  [CodeGenerationModel.OPENROUTER_GEMMA_4_26B_A4B_FREE]: {
+    text: "Free",
+    tone: "free",
+  },
+  [CodeGenerationModel.OPENROUTER_LING_3_0_FLASH_VL_FREE]: {
+    text: "Free",
+    tone: "free",
+  },
+  [CodeGenerationModel.KILO_LING_3_0_FLASH_VL_FREE]: {
+    text: "Free",
+    tone: "free",
+  },
+  [CodeGenerationModel.ZENMUX_GLM_4_6V_FLASH_FREE]: {
+    text: "Free",
+    tone: "free",
+  },
   [CodeGenerationModel.KILO_NEMOTRON_OMNI_30B_FREE]: {
     text: "Free",
     tone: "free",
@@ -238,6 +258,12 @@ export const CODE_GENERATION_MODEL_DESCRIPTIONS: {
     name: "OpenRouter: Nemotron Nano 12B VL (free)",
   },
   "openrouter/openrouter/free": { name: "OpenRouter: auto (free)" },
+  "openrouter/google/gemma-4-26b-a4b-it:free": {
+    name: "OpenRouter: Gemma 4 26B A4B (free)",
+  },
+  "openrouter/inclusionai/ling-3.0-flash-vl:free": {
+    name: "OpenRouter: Ling 3.0 Flash VL (free)",
+  },
   "nvidia/meta/llama-3.2-90b-vision-instruct": {
     name: "NVIDIA NIM: Llama 3.2 90B Vision",
   },
@@ -249,8 +275,12 @@ export const CODE_GENERATION_MODEL_DESCRIPTIONS: {
   },
   "kilo/kilo/auto": { name: "Kilo: auto" },
   "kilo/minimax/minimax-m2.5:free": { name: "Kilo: MiniMax M2.5 (free)" },
+  "kilo/inclusionai/ling-3.0-flash-vl:free": {
+    name: "Kilo: Ling 3.0 Flash VL (free)",
+  },
   "zen/gpt-5-nano": { name: "OpenCode Zen: GPT-5 Nano" },
   "zen/big-pickle": { name: "OpenCode Zen: Big Pickle (free)" },
   "zenmux/openai/gpt-5": { name: "ZenMux: GPT-5" },
   "zenmux/google/gemini-2.5-pro": { name: "ZenMux: Gemini 2.5 Pro" },
+  "zenmux/z-ai/glm-4.6v-flash-free": { name: "ZenMux: GLM 4.6V Flash (free)" },
 };

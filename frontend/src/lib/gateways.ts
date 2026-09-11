@@ -18,13 +18,19 @@ export interface GatewayOption {
   id: string;
   name: string;
   /** Settings field that stores the key; sent to the backend on every generation. */
-  apiKeyField: "openRouterApiKey" | "nvidiaApiKey" | "kiloApiKey" | "zenApiKey";
+  apiKeyField:
+    | "openRouterApiKey"
+    | "nvidiaApiKey"
+    | "kiloApiKey"
+    | "zenApiKey"
+    | "zenmuxApiKey";
   apiKeyPlaceholder: string;
   baseUrlField:
     | "openRouterBaseUrl"
     | "nvidiaBaseUrl"
     | "kiloBaseUrl"
-    | "zenBaseUrl";
+    | "zenBaseUrl"
+    | "zenmuxBaseUrl";
   /** What to prefill when the user asks for the default endpoint. */
   defaultBaseUrl: string;
   signupUrl: string;
@@ -104,6 +110,21 @@ export const GATEWAY_OPTIONS: GatewayOption[] = [
     models: [
       { model: CodeGenerationModel.ZEN_GPT_5_NANO, supportsVision: true },
       { model: CodeGenerationModel.ZEN_BIG_PICKLE, supportsVision: false },
+    ],
+  },
+  {
+    id: "zenmux",
+    name: "ZenMux",
+    apiKeyField: "zenmuxApiKey",
+    apiKeyPlaceholder: "ZenMux API key",
+    baseUrlField: "zenmuxBaseUrl",
+    defaultBaseUrl: "https://zenmux.ai/api/v1",
+    signupUrl: "https://zenmux.ai",
+    blurb:
+      "A different router than OpenCode Zen — wired as its own provider because \"Zen\" means either depending on where you read about it. Pay-per-use, no free slugs.",
+    models: [
+      { model: CodeGenerationModel.ZENMUX_GPT_5, supportsVision: true },
+      { model: CodeGenerationModel.ZENMUX_GEMINI_2_5_PRO, supportsVision: true },
     ],
   },
 ];

@@ -39,10 +39,12 @@ def _clear_gateway_env(monkeypatch: pytest.MonkeyPatch) -> None:
         "NVIDIA_API_KEY",
         "KILO_API_KEY",
         "ZEN_API_KEY",
+        "ZENMUX_API_KEY",
         "OPENROUTER_BASE_URL",
         "NVIDIA_BASE_URL",
         "KILO_BASE_URL",
         "ZEN_BASE_URL",
+        "ZENMUX_BASE_URL",
     ):
         monkeypatch.delenv(name, raising=False)
         monkeypatch.setattr(config, name, None, raising=False)

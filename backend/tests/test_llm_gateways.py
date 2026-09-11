@@ -101,7 +101,13 @@ def test_api_key_prefers_the_request_then_env(
 def test_configured_gateways_follows_request_and_env_keys(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    for name in ("OPENROUTER_API_KEY", "NVIDIA_API_KEY", "KILO_API_KEY", "ZEN_API_KEY"):
+    for name in (
+        "OPENROUTER_API_KEY",
+        "NVIDIA_API_KEY",
+        "KILO_API_KEY",
+        "ZEN_API_KEY",
+        "ZENMUX_API_KEY",
+    ):
         monkeypatch.delenv(name, raising=False)
         monkeypatch.setattr(config, name, None)
 

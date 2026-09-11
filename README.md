@@ -57,7 +57,7 @@ the best results and lets you compare multiple models per generation.
 | `ANTHROPIC_API_KEY` | One of these three | Claude code-gen variants (Opus 5, Opus 4.8, Fable 5, Sonnet 4.6) |
 | `GEMINI_API_KEY` | One of these three — **strongly recommended** | Gemini code-gen variants (3 Flash, 3.1 Pro); extracts real assets from the screenshot; required for video mode |
 | `REPLICATE_API_KEY` | **Strongly recommended** | Image editing, background removal, and Replicate-backed image generation — without it, `edit_images` and `remove_backgrounds` are unavailable |
-| `OPENROUTER_API_KEY`, `NVIDIA_API_KEY`, `KILO_API_KEY`, `ZEN_API_KEY` | Optional | Free / low-cost code-gen variants through OpenAI-compatible gateways. Used only when no OpenAI, Anthropic, or Gemini key is present |
+| `OPENROUTER_API_KEY`, `NVIDIA_API_KEY`, `KILO_API_KEY`, `ZEN_API_KEY`, `ZENMUX_API_KEY` | Optional | Free / low-cost code-gen variants through OpenAI-compatible gateways. Used only when no OpenAI, Anthropic, or Gemini key is present |
 
 With more keys, the app automatically picks a stronger mix of models per
 variant; with a single key it uses that provider's models only.
@@ -114,6 +114,11 @@ in variant selection, the run logs, and the Settings dialog.
 | NVIDIA NIM | `https://integrate.api.nvidia.com/v1` | `NVIDIA_API_KEY` |
 | Kilo | `https://api.kilo.ai/api/gateway` | `KILO_API_KEY` |
 | OpenCode Zen | `https://opencode.ai/zen/v1` | `ZEN_API_KEY` |
+| ZenMux | `https://zenmux.ai/api/v1` | `ZENMUX_API_KEY` |
+
+"Zen" is two different routers depending on who you ask, so both are wired:
+`zen` is OpenCode Zen (free models, rotating catalog) and `zenmux` is ZenMux
+(pay-per-use routing to GPT/Gemini/Claude).
 
 - Add the key in the Settings dialog or `backend/.env`; a `.env` change needs a
   backend restart.
@@ -131,9 +136,12 @@ in variant selection, the run logs, and the Settings dialog.
 - Models marked `supports_tools: false` (e.g. the hosted Llama Vision builds)
   are not offered agent tools; they write the HTML directly in one answer.
 - Running behind a proxy or a self-hosted endpoint? Set `OPENROUTER_BASE_URL`,
-  `NVIDIA_BASE_URL`, `KILO_BASE_URL`, or `ZEN_BASE_URL`, or use the matching
-  field in the Settings dialog. Like `OPENAI_BASE_URL`, these overrides are
-  ignored on the hosted app.
+  `NVIDIA_BASE_URL`, `KILO_BASE_URL`, `ZEN_BASE_URL`, or `ZENMUX_BASE_URL`, or
+  use the matching field in the Settings dialog. Like `OPENAI_BASE_URL`, these
+  overrides are ignored on the hosted app.
+- A variant that fails says *which provider* failed — a 429 on a shared `:free`
+  model tells you to retry or use a first-party key instead of sending you to
+  OpenAI's billing page.
 - OpenRouter (and Kilo, which is OpenRouter-compatible) attribute traffic by
   app, so the backend sends `HTTP-Referer` and `X-Title` headers on those
   requests.

@@ -22,11 +22,16 @@ from config import (
 )
 from custom_types import InputMode
 from llm import (
+    ANTHROPIC_MODELS,
+    GEMINI_MODELS,
     Llm,
+    OPENAI_MODELS,
 )
 from llm_gateways import (
     GATEWAYS,
     configured_gateways,
+    gateway_api_name,
+    gateway_for_model,
     gateway_settings_values,
     select_gateway_models,
 )
@@ -84,7 +89,6 @@ from routes.model_choice_sets import (
 
 # from utils import pprint_prompt
 from ws.constants import APP_ERROR_WEB_SOCKET_CODE  # type: ignore
-
 
 router = APIRouter()
 
@@ -629,12 +633,96 @@ class PostProcessingStage:
         return None
 
 
+@dataclass(frozen=True)
+class VariantProvider:
+    """Who is serving a variant, so failures name the right thing.
+
+    The OpenAI/Anthropic/Gemini copy is what these messages always said (the
+    label is substituted); gateway variants get their own text because "check
+    your OpenAI billing details" is bad advice when a shared `:free` model is
+    rate-limited or the key came from OpenRouter.
+    """
+
+    label: str
+    is_gateway: bool = False
+    env_var: str | None = None
+    docs_url: str | None = None
+    model_id: str | None = None
+
+    def auth_error(self) -> str:
+        if not self.is_gateway:
+            return (
+                f"Incorrect {self.label} key. Please make sure your {self.label} "
+                f"API key is correct, or create a new {self.label} API key on "
+                f"your {self.label} dashboard."
+            )
+        return (
+            f"Incorrect {self.label} API key. Check the value in the settings "
+            f"dialog"
+            + (f" or {self.env_var} in backend/.env." if self.env_var else ".")
+        )
+
+    def not_found_error(self, detail: str) -> str:
+        if not self.is_gateway:
+            if self.label == "OpenAI":
+                return (
+                    f"{detail}. Please make sure you have followed the instructions "
+                    "correctly to obtain an OpenAI key with GPT vision access: "
+                    "https://github.com/abi/screenshot-to-code/blob/main/Troubleshooting.md"
+                )
+            return (
+                f"{detail}. Please make sure your {self.label} key has access to "
+                f"{self.model_id}."
+            )
+        return (
+            f"{detail}. `{self.model_id}` may not be offered by {self.label}, or "
+            f"may have been renamed - check its current model list"
+            + (f" at {self.docs_url}" if self.docs_url else "")
+            + "."
+        )
+
+    def rate_limit_error(self) -> str:
+        if not self.is_gateway:
+            return (
+                f"{self.label} error - 'You exceeded your current quota, please "
+                "check your plan and billing details.'"
+            )
+        return (
+            f"{self.label} is rate-limiting this request. Free-tier models are "
+            "shared and saturate often, so retry shortly, or add an OpenAI, "
+            "Anthropic, or Gemini key for the frontier variants."
+        )
+
+
+def _describe_provider(model: Llm) -> VariantProvider:
+    """Label a model by the provider that would actually serve it."""
+    gateway = gateway_for_model(model)
+    if gateway is not None:
+        return VariantProvider(
+            label=gateway.display_name,
+            is_gateway=True,
+            env_var=gateway.api_key_env,
+            docs_url=gateway.docs_url,
+            model_id=gateway_api_name(model),
+        )
+    if model in ANTHROPIC_MODELS:
+        return VariantProvider(label="Anthropic")
+    if model in GEMINI_MODELS:
+        return VariantProvider(label="Gemini")
+    if model in OPENAI_MODELS:
+        return VariantProvider(label="OpenAI")
+    return VariantProvider(label="model provider")
+
+
 class AgenticGenerationStage:
     """Handles agent tool-calling generation for each variant."""
 
     def __init__(
         self,
-        send_message: Callable[[MessageType, str | None, int, Dict[str, Any] | None, str | None], Coroutine[Any, Any, None]],
+        send_message: Callable[
+            [MessageType, str | None, int, Dict[str, Any] | None, str | None],
+            Coroutine[Any, Any, None],
+        ],
         openai_api_key: str | None,
         openai_base_url: str | None,
         anthropic_api_key: str | None,
@@ -672,6 +760,14 @@ class AgenticGenerationStage:
         self.stack = stack
         self.input_mode = input_mode
         self.generation_type = generation_type
+        # The hosted product offers credits as an escape hatch when a user's own
+        # key fails; local runs have nothing to purchase.
+        self._credits_hint = (
+            " Alternatively, you can purchase code generation credits directly "
+            "on this website."
+            if IS_PROD
+            else ""
+        )
 
     async def process_variants(
         self,
@@ -681,9 +777,7 @@ class AgenticGenerationStage:
         tasks: List[asyncio.Task[str]] = []
         for index, model in enumerate(variant_models):
             tasks.append(
-                asyncio.create_task(
-                    self._run_variant(index, model, prompt_messages)
-                )
+                asyncio.create_task(self._run_variant(index, model, prompt_messages))
             )
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -703,7 +797,9 @@ class AgenticGenerationStage:
         model: Llm,
         prompt_messages: List[ChatCompletionMessageParam],
     ) -> str:
+        provider = _describe_provider(model)
         try:
+
             async def send_runner_message(
                 type: str,
                 value: str | None,
@@ -756,43 +852,18 @@ class AgenticGenerationStage:
             )
             return completion
         except openai.AuthenticationError as e:
-            print(f"[VARIANT {index + 1}] OpenAI Authentication failed", e)
-            error_message = (
-                "Incorrect OpenAI key. Please make sure your OpenAI API key is correct, "
-                "or create a new OpenAI API key on your OpenAI dashboard."
-                + (
-                    " Alternatively, you can purchase code generation credits directly on this website."
-                    if IS_PROD
-                    else ""
-                )
-            )
+            print(f"[VARIANT {index + 1}] {provider.label} authentication failed", e)
+            error_message = provider.auth_error() + self._credits_hint
             await self.send_message("variantError", error_message, index, None, None)
             return ""
         except openai.NotFoundError as e:
-            print(f"[VARIANT {index + 1}] OpenAI Model not found", e)
-            error_message = (
-                e.message
-                + ". Please make sure you have followed the instructions correctly to obtain "
-                "an OpenAI key with GPT vision access: "
-                "https://github.com/abi/screenshot-to-code/blob/main/Troubleshooting.md"
-                + (
-                    " Alternatively, you can purchase code generation credits directly on this website."
-                    if IS_PROD
-                    else ""
-                )
-            )
+            print(f"[VARIANT {index + 1}] {provider.label} model not found", e)
+            error_message = provider.not_found_error(e.message) + self._credits_hint
             await self.send_message("variantError", error_message, index, None, None)
             return ""
         except openai.RateLimitError as e:
-            print(f"[VARIANT {index + 1}] OpenAI Rate limit exceeded", e)
-            error_message = (
-                "OpenAI error - 'You exceeded your current quota, please check your plan and billing details.'"
-                + (
-                    " Alternatively, you can purchase code generation credits directly on this website."
-                    if IS_PROD
-                    else ""
-                )
-            )
+            print(f"[VARIANT {index + 1}] {provider.label} rate limit exceeded", e)
+            error_message = provider.rate_limit_error() + self._credits_hint
             await self.send_message("variantError", error_message, index, None, None)
             return ""
         except Exception as e:
@@ -969,9 +1040,7 @@ class PostProcessingMiddleware(Middleware):
         self, context: PipelineContext, next_func: Callable[[], Awaitable[None]]
     ) -> None:
         post_processor = PostProcessingStage()
-        await post_processor.process_completions(
-            context.completions, context.websocket
-        )
+        await post_processor.process_completions(context.completions, context.websocket)
 
         await next_func()
 

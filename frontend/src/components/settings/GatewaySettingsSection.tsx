@@ -10,15 +10,9 @@ interface Props {
   setSettings: React.Dispatch<React.SetStateAction<Settings>>;
 }
 
-type GatewayField =
-  | "openRouterApiKey"
-  | "openRouterBaseUrl"
-  | "nvidiaApiKey"
-  | "nvidiaBaseUrl"
-  | "kiloApiKey"
-  | "kiloBaseUrl"
-  | "zenApiKey"
-  | "zenBaseUrl";
+// Derived from the registry rather than re-listed, so a new gateway field can
+// never be added to one place and forgotten in the other.
+type GatewayField = GatewayOption["apiKeyField"] | GatewayOption["baseUrlField"];
 
 // Explicit per-field update rather than a computed key, so a typo in a field
 // name is a compile error instead of a setting that silently never persists.

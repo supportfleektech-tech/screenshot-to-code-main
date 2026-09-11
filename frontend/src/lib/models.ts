@@ -53,6 +53,8 @@ export enum CodeGenerationModel {
   KILO_MINIMAX_M2_5_FREE = "kilo/minimax/minimax-m2.5:free",
   ZEN_GPT_5_NANO = "zen/gpt-5-nano",
   ZEN_BIG_PICKLE = "zen/big-pickle",
+  ZENMUX_GPT_5 = "zenmux/openai/gpt-5",
+  ZENMUX_GEMINI_2_5_PRO = "zenmux/google/gemini-2.5-pro",
 }
 
 export type VariantLabelTone = "fast" | "max" | "free";
@@ -249,4 +251,6 @@ export const CODE_GENERATION_MODEL_DESCRIPTIONS: {
   "kilo/minimax/minimax-m2.5:free": { name: "Kilo: MiniMax M2.5 (free)" },
   "zen/gpt-5-nano": { name: "OpenCode Zen: GPT-5 Nano" },
   "zen/big-pickle": { name: "OpenCode Zen: Big Pickle (free)" },
+  "zenmux/openai/gpt-5": { name: "ZenMux: GPT-5" },
+  "zenmux/google/gemini-2.5-pro": { name: "ZenMux: Gemini 2.5 Pro" },
 };

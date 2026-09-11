@@ -36,6 +36,9 @@ export interface Settings {
   kiloBaseUrl: string | null;
   zenApiKey: string | null;
   zenBaseUrl: string | null;
+  // ZenMux: a different router than OpenCode Zen ("Zen" means either).
+  zenmuxApiKey: string | null;
+  zenmuxBaseUrl: string | null;
 }
 
 export interface DesignSystem {

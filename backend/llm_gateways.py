@@ -1,4 +1,4 @@
-"""Registry of OpenAI-compatible gateways (OpenRouter, NVIDIA NIM, Kilo, Zen).
+"""Registry of OpenAI-compatible gateways (OpenRouter, NVIDIA NIM, Kilo, Zen, ZenMux).
 
 These providers all speak the OpenAI *Chat Completions* wire format, so no new
 SDK is needed: the existing ``AsyncOpenAI`` client is pointed at a different
@@ -223,8 +223,32 @@ _ZEN = Gateway(
 )
 
 # Order matters: it is the tie-break for variant selection.
+_ZENMUX = Gateway(
+    id="zenmux",
+    display_name="ZenMux",
+    default_base_url="https://zenmux.ai/api/v1",
+    api_key_env="ZENMUX_API_KEY",
+    base_url_env="ZENMUX_BASE_URL",
+    settings_key="zenmuxApiKey",
+    settings_base_url_key="zenmuxBaseUrl",
+    docs_url="https://zenmux.ai",
+    # ZenMux routes frontier models rather than hosting free slugs, so these
+    # are the pay-per-use ids its own docs use. Listed for the case where
+    # "the Zen gateway" meant this one rather than OpenCode Zen.
+    models=(
+        GatewayModel(
+            api_name="openai/gpt-5", supports_vision=True, supports_tools=True
+        ),
+        GatewayModel(
+            api_name="google/gemini-2.5-pro",
+            supports_vision=True,
+            supports_tools=True,
+        ),
+    ),
+)
+
 GATEWAYS: Dict[str, Gateway] = {
-    gateway.id: gateway for gateway in (_OPENROUTER, _NVIDIA, _KILO, _ZEN)
+    gateway.id: gateway for gateway in (_OPENROUTER, _NVIDIA, _KILO, _ZEN, _ZENMUX)
 }
 
 GATEWAY_FOR_MODEL: Dict[Llm, Gateway] = {}

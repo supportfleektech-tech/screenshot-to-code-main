@@ -101,6 +101,8 @@ function App() {
       kiloBaseUrl: null,
       zenApiKey: null,
       zenBaseUrl: null,
+      zenmuxApiKey: null,
+      zenmuxBaseUrl: null,
       screenshotOneApiKey: null,
       isImageGenerationEnabled: true,
       editorTheme: EditorTheme.COBALT,

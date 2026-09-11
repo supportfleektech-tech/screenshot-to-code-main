@@ -20,6 +20,8 @@ KILO_API_KEY = os.environ.get("KILO_API_KEY", None)
 KILO_BASE_URL = os.environ.get("KILO_BASE_URL", None)
 ZEN_API_KEY = os.environ.get("ZEN_API_KEY", None)
 ZEN_BASE_URL = os.environ.get("ZEN_BASE_URL", None)
+ZENMUX_API_KEY = os.environ.get("ZENMUX_API_KEY", None)
+ZENMUX_BASE_URL = os.environ.get("ZENMUX_BASE_URL", None)
 
 # Image generation (optional)
 REPLICATE_API_KEY = os.environ.get("REPLICATE_API_KEY", None)

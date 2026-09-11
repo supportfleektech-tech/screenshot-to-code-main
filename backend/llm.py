@@ -76,6 +76,10 @@ class Llm(Enum):
     KILO_MINIMAX_M2_5_FREE = "kilo/minimax/minimax-m2.5:free"
     ZEN_GPT_5_NANO = "zen/gpt-5-nano"
     ZEN_BIG_PICKLE = "zen/big-pickle"
+    # ZenMux is a different router than OpenCode Zen; both are wired because
+    # "Zen" means either depending on where you read about it.
+    ZENMUX_GPT_5 = "zenmux/openai/gpt-5"
+    ZENMUX_GEMINI_2_5_PRO = "zenmux/google/gemini-2.5-pro"
 
 
 class Completion(TypedDict):
@@ -150,6 +154,8 @@ MODEL_PROVIDER: dict[Llm, str] = {
     Llm.KILO_MINIMAX_M2_5_FREE: "kilo",
     Llm.ZEN_GPT_5_NANO: "zen",
     Llm.ZEN_BIG_PICKLE: "zen",
+    Llm.ZENMUX_GPT_5: "zenmux",
+    Llm.ZENMUX_GEMINI_2_5_PRO: "zenmux",
 }
 
 # Convenience sets for membership checks
@@ -159,7 +165,7 @@ GEMINI_MODELS = {m for m, p in MODEL_PROVIDER.items() if p == "gemini"}
 
 # Every model that is served through an OpenAI-compatible gateway rather than a
 # first-party SDK. `llm_gateways.GATEWAYS` owns the connection details.
-OPENAI_COMPATIBLE_PROVIDER_IDS = ("openrouter", "nvidia", "kilo", "zen")
+OPENAI_COMPATIBLE_PROVIDER_IDS = ("openrouter", "nvidia", "kilo", "zen", "zenmux")
 OPENAI_COMPATIBLE_MODELS = {
     m for m, p in MODEL_PROVIDER.items() if p in OPENAI_COMPATIBLE_PROVIDER_IDS
 }
